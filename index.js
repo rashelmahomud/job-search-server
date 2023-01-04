@@ -29,14 +29,13 @@ async function run() {
 
         app.get("/user/:email", async (req, res) => {
             const email = req.params.email;
-
             const result = await userCollection.findOne({ email });
-
             if (result?.email) {
                 return res.send({ status: true, data: result });
             }
             res.send({ status: false });
         });
+        
 
         app.post("/job", async (req, res) => {
             const job = req.body;
@@ -56,6 +55,30 @@ async function run() {
             const result = await jobCollection.findOne({ _id: ObjectId(id) });
             res.send({ status: true, data: result });
         });
+
+
+        app.patch("/apply", async (req, res) => {
+            const userId = req.body.userId;
+            const jobId = req.body.jobId;
+            const email = req.body.email;
+      
+            const filter = { _id: ObjectId(jobId) };
+            const updateDoc = {
+              $push: { apllicants: { id: ObjectId(userId), email } },
+            };
+      
+            const result = await jobCollection.updateOne(filter, updateDoc);
+      
+            if (result.acknowledged) {
+              return res.send({ status: true, data: result });
+            }
+      
+            res.send({ status: false });
+          });
+
+
+
+
 
     }
 
